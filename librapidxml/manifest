@@ -1,6 +1,6 @@
 : 1
 name: librapidxml
-version: 0.1.0-a.0.z
+version: 1.13.0-a.0.z
 type: lib,binless
 language: c++
 project: build2-RapidXML
