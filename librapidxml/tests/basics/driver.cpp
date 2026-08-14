@@ -1,34 +1,34 @@
-#include <sstream>
-#include <stdexcept>
-
 #include <rapidxml/rapidxml.hpp>
+#include <rapidxml/rapidxml_print.hpp>
+#include <rapidxml/rapidxml_iterators.hpp>
+#include <rapidxml/rapidxml_utils.hpp>
+
+#include <iterator>
+#include <string>
 
 #undef NDEBUG
 #include <cassert>
 
 int main ()
 {
-  using namespace std;
   using namespace rapidxml;
 
-  // Basics.
-  //
-  {
-    ostringstream o;
-    say_hello (o, "World");
-    assert (o.str () == "Hello, World!\n");
-  }
+  char text[] = "<?xml version='1.0'?><root id='1'><child>hi</child></root>";
 
-  // Empty name.
-  //
-  try
-  {
-    ostringstream o;
-    say_hello (o, "");
-    assert (false);
-  }
-  catch (const invalid_argument& e)
-  {
-    assert (e.what () == string ("empty name"));
-  }
+  xml_document<> doc;
+  doc.parse<0> (text);
+
+  xml_node<>* root (doc.first_node ("root"));
+  assert (root != nullptr);
+  assert (root->first_attribute ("id") != nullptr);
+  assert (root->first_node ("child") != nullptr);
+
+  node_iterator<char> b (root);
+  node_iterator<char> e;
+  assert (b != e);
+
+  std::string out;
+  print (std::back_inserter (out), doc, print_no_indenting);
+  assert (out.find ("<root") != std::string::npos);
+  assert (out.find ("hi") != std::string::npos);
 }
