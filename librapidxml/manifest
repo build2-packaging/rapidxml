@@ -3,14 +3,25 @@ name: librapidxml
 version: 1.13.0-a.0.z
 type: lib,binless
 language: c++
-project: build2-RapidXML
-summary: rapidxml C++ library
-license: other: proprietary ; Not free/open source.
+project: rapidxml
+summary: XML DOM-style parser C++ library
+license: BSL-1.0
+license: MIT
+description:
+\
+RapidXml is a fast XML DOM-style parser written in C++.
+#
+It provides a minimalistic API and a reduced memory footprint suitable
+for embedded applications. This package tracks Debian rapidxml 1.13-3
+and applies the two Debian compilation patches.
+\
 package-description-file: PACKAGE-README.md
-changes-file: CHANGELOG
-url: https://example.org/upstream
-email: upstream@example.org
-package-url: https://github.com/build2-packaging/build2-RapidXML
+changes-file: ChangeLog
+url: http://rapidxml.sourceforge.net
+doc-url: http://rapidxml.sourceforge.net/manual.html
+src-url: https://salsa.debian.org/debian/rapidxml
+package-url: https://github.com/build2-packaging/rapidxml
 package-email: packaging@build2.org ; Mailing list.
+topics: xml parser, xml dom, header-only
 depends: * build2 >= 0.18.0
 depends: * bpkg >= 0.18.0
