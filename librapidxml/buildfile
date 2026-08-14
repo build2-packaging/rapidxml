@@ -1,4 +1,4 @@
-./: {*/ -build/} doc{PACKAGE-README.md CHANGELOG} legal{LICENSE COPYRIGHT} manifest
+./: {*/ -build/} doc{PACKAGE-README.md ChangeLog manual.html} legal{LICENSE copyright} manifest
 
 # Don't install tests.
 #
