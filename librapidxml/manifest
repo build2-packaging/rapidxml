@@ -1,0 +1,16 @@
+: 1
+name: librapidxml
+version: 0.1.0-a.0.z
+type: lib,binless
+language: c++
+project: build2-RapidXML
+summary: rapidxml C++ library
+license: other: proprietary ; Not free/open source.
+package-description-file: PACKAGE-README.md
+changes-file: CHANGELOG
+url: https://example.org/upstream
+email: upstream@example.org
+package-url: https://github.com/build2-packaging/build2-RapidXML
+package-email: packaging@build2.org ; Mailing list.
+depends: * build2 >= 0.18.0
+depends: * bpkg >= 0.18.0

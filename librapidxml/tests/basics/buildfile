@@ -1,0 +1,3 @@
+import libs = librapidxml%lib{rapidxml}
+
+exe{driver}: {hxx ixx txx cxx}{**} $libs testscript{**}
