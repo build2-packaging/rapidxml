@@ -31,4 +31,24 @@ int main ()
   print (std::back_inserter (out), doc, print_no_indenting);
   assert (out.find ("<root") != std::string::npos);
   assert (out.find ("hi") != std::string::npos);
+
+  // xml:space="preserve" must survive parse_trim_whitespace, as cereal relies
+  // on. Unmarked text is still trimmed.
+  //
+  {
+    char space[] =
+      "<root>"
+      "<plain>  hi  </plain>"
+      "<kept xml:space='preserve'>  hi  </kept>"
+      "</root>";
+
+    xml_document<> d;
+    d.parse<parse_trim_whitespace | parse_no_data_nodes> (space);
+
+    xml_node<>* plain (d.first_node ("root")->first_node ("plain"));
+    xml_node<>* kept (d.first_node ("root")->first_node ("kept"));
+    assert (plain != nullptr && kept != nullptr);
+    assert (std::string (plain->value (), plain->value_size ()) == "hi");
+    assert (std::string (kept->value (), kept->value_size ()) == "  hi  ");
+  }
 }

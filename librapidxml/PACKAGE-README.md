@@ -6,9 +6,10 @@ and a reduced memory footprint.
 
 This package tracks Debian `rapidxml` 1.13-3 (upstream RapidXml 1.13). It
 applies Debian's `fix-iterators.patch` and `rapidxml_print.hpp` Clang
-forward-declaration patch, and also finishes the iterator fix on
+forward-declaration patch, finishes the iterator fix on
 `attribute_iterator` postfix `++`/`--` (`++this` to `++(*this)`), which
-Debian's patch left unfixed.
+Debian's patch left unfixed, and honors `xml:space="preserve"` so
+`parse_trim_whitespace` does not strip marked element values.
 
 
 ## Usage

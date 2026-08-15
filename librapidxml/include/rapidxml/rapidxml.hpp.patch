@@ -1,0 +1,88 @@
+--- rapidxml.hpp.orig	2026-08-15 01:11:15
++++ rapidxml.hpp	2026-08-15 02:37:23
+@@ -334,6 +334,15 @@
+                         return false;
+             }
+             return true;
++        }
++
++        // Honor xml:space="preserve" (used by cereal and valid XML).
++        template<class Ch>
++        inline bool preserve_space(xml_node<Ch>* node)
++        {
++            const Ch preserve_value[] = { Ch('p'), Ch('r'), Ch('e'), Ch('s'), Ch('e'), Ch('r'), Ch('v'), Ch('e') };
++            const xml_attribute<Ch>* space = node->first_attribute("xml:space");
++            return space && internal::compare(space->value(), space->value_size(), preserve_value, sizeof(preserve_value) / sizeof(Ch), true);
+         }
+     }
+     //! \endcond
+@@ -1567,7 +1576,7 @@
+         // - replacing XML character entity references with proper characters (&apos; &amp; &quot; &lt; &gt; &#...;)
+         // - condensing whitespace sequences to single space character
+         template<class StopPred, class StopPredPure, int Flags>
+-        static Ch *skip_and_expand_character_refs(Ch *&text)
++        static Ch *skip_and_expand_character_refs(Ch *&text, bool preserve_space = false)
+         {
+             // If entity translation, whitespace condense and whitespace trimming is disabled, use plain skip
+             if (Flags & parse_no_entity_translation && 
+@@ -1692,7 +1701,7 @@
+                 }
+                 
+                 // If whitespace condensing is enabled
+-                if (Flags & parse_normalize_whitespace)
++                if ((Flags & parse_normalize_whitespace) && !preserve_space)
+                 {
+                     // Test if condensing is needed                 
+                     if (whitespace_pred::test(*src))
+@@ -1941,17 +1950,19 @@
+         {
+             // Backup to contents start if whitespace trimming is disabled
+             if (!(Flags & parse_trim_whitespace))
+-                text = contents_start;     
+-            
++                text = contents_start;
++
++            const bool preserve_space = internal::preserve_space(node);
++
+             // Skip until end of data
+             Ch *value = text, *end;
+-            if (Flags & parse_normalize_whitespace)
+-                end = skip_and_expand_character_refs<text_pred, text_pure_with_ws_pred, Flags>(text);   
++            if ((Flags & parse_normalize_whitespace) && !preserve_space)
++                end = skip_and_expand_character_refs<text_pred, text_pure_with_ws_pred, Flags>(text, false);
+             else
+-                end = skip_and_expand_character_refs<text_pred, text_pure_no_ws_pred, Flags>(text);
++                end = skip_and_expand_character_refs<text_pred, text_pure_no_ws_pred, Flags>(text, preserve_space);
+ 
+             // Trim trailing whitespace if flag is set; leading was already trimmed by whitespace skip after >
+-            if (Flags & parse_trim_whitespace)
++            if ((Flags & parse_trim_whitespace) && !preserve_space)
+             {
+                 if (Flags & parse_normalize_whitespace)
+                 {
+@@ -2188,6 +2199,12 @@
+                 case Ch('<'):
+                     if (text[1] == Ch('/'))
+                     {
++                        Ch *contents_end = 0;
++                        if (internal::preserve_space(node))
++                        {
++                            contents_end = text;
++                        }
++
+                         // Node closing
+                         text += 2;      // Skip '</'
+                         if (Flags & parse_validate_closing_tags)
+@@ -2208,6 +2225,12 @@
+                         if (*text != Ch('>'))
+                             RAPIDXML_PARSE_ERROR("expected >", text);
+                         ++text;     // Skip '>'
++
++                        if (contents_end && contents_end != contents_start)
++                        {
++                            node->value(contents_start, static_cast<std::size_t>(contents_end - contents_start));
++                            node->value()[node->value_size()] = Ch('\0');
++                        }
+                         return;     // Node closed, finished parsing contents
+                     }
+                     else
