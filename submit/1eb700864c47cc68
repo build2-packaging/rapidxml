@@ -1,0 +1,9 @@
+: 1
+name: librapidxml
+version: 1.13.0
+type: lib,binless
+language: c++
+project: rapidxml
+summary: XML DOM-style parser C++ library
+license: BSL-1.0
+license: MIT
